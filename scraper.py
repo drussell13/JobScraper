@@ -2,8 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 
 
-job_titles = ["psychologist-internship", "psychologist-intern"]
-locations = ["All-Brisbane-QLD"]
+job_titles = ["psychologist"]
+locations = ["All-Brisbane-QLD", "East-Ipswich-QLD-4305", "Ipswich-QLD-4305", "Western-Suburbs-&-Ipswich-Brisbane-QLD"]
 
 seek_search_url = "https://www.seek.com.au/{title}-jobs/in-{location}"
 seek_job_url = "https://www.seek.com.au/job/{id}"
@@ -60,7 +60,7 @@ def get_job_details(job_id):
 def job_passes_filter(job_details):
     filter_satisfied = False
 
-    search_terms = ["graduate", "registrar", "provisional", "internship", "4+2"]
+    search_terms = ["provisional", "4+2"]
 
     for term in search_terms:
         if term in job_details["title"].lower() or term in job_details["details"].lower():
@@ -70,17 +70,18 @@ def job_passes_filter(job_details):
     return filter_satisfied
 
 
-def scrape(search_url):
-    job_ids = get_search_results(search_url)
-
-    results = []    
+def process_search_results(job_ids):
+    results = []
+    total_rows_processed = 0    
+    
     for id in job_ids:
-        print("Processing job with id {}".format(id))
-
         job_details = get_job_details(id)
     
         if job_details is not None and job_passes_filter(job_details):
             results.append(job_details)
+
+        total_rows_processed += 1
+        print("Processed {} row(s), {} jobs found".format(total_rows_processed, len(results)))
 
     return results
 
@@ -104,13 +105,18 @@ def output_results(results):
 
 
 def main():
-    total_results = []
+    search_results = []
     for title in job_titles:
         for loc in locations:
             search_url = seek_search_url.format(title=title, location=loc)
-            total_results += scrape(search_url)  # add in smarts for dup checking
+            print("Searching - {}".format(search_url))
+            search_results += get_search_results(search_url)
 
-    output_results(total_results)
+    search_results = set(search_results)
+
+    results = process_search_results(search_results)
+
+    output_results(results)
 
 
 if __name__ == "__main__":
