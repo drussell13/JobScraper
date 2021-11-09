@@ -3,3 +3,4 @@ job_listings.csv
 launch.json
 .vscode
 results
+*.pyc
