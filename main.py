@@ -59,7 +59,7 @@ def get_previously_retrieved_jobs():
 
 def main():
     total_jobs_found = []
-    
+
     seek_scrpr = SeekScraper(job_titles=seek_job_titles, locations=seek_locations, filters=filters)
     total_jobs_found += seek_scrpr.get_jobs()
     

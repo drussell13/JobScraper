@@ -30,13 +30,13 @@ class Scraper:
         
         return self.filter_results(results)
         
-        
+
     def get_search_results(self, search_url):
-        pass  # Implement in child class based on particular site 
+        raise NotImplementedError("Must be implemented in child class for particular job site.")
     
     
     def process_search_results(self, job_ids):
-        pass  # Implement in child class based on particular site 
+        raise NotImplementedError("Must be implemented in child class for particular job site.")
     
     
     def filter_results(self, results):
