@@ -1,14 +1,19 @@
 import csv
-from scraper.seek_scraper import SeekScraper
+from jobfinder.seek_scraper import SeekScraper
+from jobfinder.indeed_scraper import IndeedScraper
+from jobfinder.job_finder import JobFinder
 
 seek_job_titles = ["psychologist"]
-
+# seek_job_titles = ["software-intern"]
 seek_locations = ["All-Brisbane-QLD", 
              "East-Ipswich-QLD-4305", 
              "Ipswich-QLD-4305", 
              "Western-Suburbs-&-Ipswich-Brisbane-QLD",
-             "Southern-Suburbs-&-Logan-Brisbane-QLD",
-             "All-Gold-Coast-QLD"]
+             "Southern-Suburbs-&-Logan-Brisbane-QLD"]
+
+indeed_job_titles = [job.replace('-', '+') for job in seek_job_titles]
+
+indeed_locations = ["Brisbane+QLD"]
 
 filters = {
     "must_contain_terms": ["psychologist"],
@@ -58,12 +63,14 @@ def get_previously_retrieved_jobs():
 
 
 def main():
-    total_jobs_found = []
-
-    seek_scrpr = SeekScraper(job_titles=seek_job_titles, locations=seek_locations, filters=filters)
-    total_jobs_found += seek_scrpr.get_jobs()
+    scrapers = [IndeedScraper(job_titles=indeed_job_titles, locations=indeed_locations),
+                SeekScraper(job_titles=seek_job_titles, locations=seek_locations)]
     
-    output_results(total_jobs_found)
+    job_finder = JobFinder(scrapers=scrapers, filters=filters)
+
+    jobs = job_finder.get_jobs()
+
+    output_results(jobs)
 
 
 if __name__ == "__main__":

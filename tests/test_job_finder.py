@@ -1,9 +1,8 @@
 import pytest
-from functools import partial
-from scraper.scraper import Scraper
+from jobfinder.job_finder import JobFinder
 
 
-class TestScraper:
+class TestJobFinder:
     @pytest.fixture
     def jobs(self):
         return [
@@ -16,8 +15,8 @@ class TestScraper:
         ]
 
     def test_filter_results_w_no_filter(self, jobs):
-        scpr = Scraper(["Developer"], ["Brisbane"], "www.job.com", "www.job.com")
-        filtered_results = scpr.filter_results(jobs)
+        job_finder = JobFinder(None, None)
+        filtered_results = job_finder._JobFinder__filter_results(jobs)
         assert filtered_results == jobs
 
     @pytest.mark.parametrize(
@@ -41,23 +40,6 @@ class TestScraper:
         ],
     )
     def test_filter_results_w_filter(self, jobs, filters, expected_result):
-        scpr = Scraper(
-            ["Developer"], ["Brisbane"], "www.job.com", "www.job.com", filters=filters
-        )
-        filtered_results = scpr.filter_results(jobs)
-        assert expected_result == filtered_results
-
-    err_scpr = Scraper(["Developer"], ["Brisbane"], "www.job.com", "www.job.com")
-
-    @pytest.mark.parametrize(
-        "scpr_func",
-        [
-            err_scpr.get_jobs,
-            partial(err_scpr.get_search_results, ""),
-            partial(err_scpr.process_search_results, ""),
-        ],
-    )
-    def test_scraper_errors(self, scpr_func):
-        error_msg = "Not implemented in Scraper parent class. Please use child class for specific site."
-        with pytest.raises(NotImplementedError, match=error_msg):
-            scpr_func()
+        job_finder = JobFinder(None, filters)
+        filtered_results = job_finder._JobFinder__filter_results(jobs)
+        assert filtered_results == expected_result

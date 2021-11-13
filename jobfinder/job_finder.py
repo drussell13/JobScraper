@@ -1,45 +1,19 @@
-class Scraper:
-    
-    def __init__(self, job_titles, locations, search_url_tmplt, job_url_tmplt, filters=None):
-        self.job_titles = job_titles
-        self.locations = locations
-        self.search_url_template = search_url_tmplt
-        self.job_url_template = job_url_tmplt
+class JobFinder:
+    def __init__(self, scrapers, filters=None):
+        self.scrapers = scrapers
         self.filters = self.__decapitalise_filters(filters)
     
     
     def get_jobs(self):
+        jobs = []
+        for scraper in self.scrapers:
+            jobs += scraper.scrape_jobs()
         
-        # Step 1 - Retrieve list of job_ids from the search 
-        
-        search_results = []
-        for title in self.job_titles:
-            for loc in self.locations:
-                url = self.search_url_template.format(title=title, location=loc)
-                print("Searching - {}".format(url))
-                search_results += self.get_search_results(url)
-
-        search_results = list(set(search_results))
-        search_results.sort()
-
-        print("\nFound {} possible jobs!\n".format(len(search_results)))
-
-        # Step 2 - Check each job from search result and return those that pass our filters
-
-        results = self.process_search_results(search_results)
-        
-        return self.filter_results(results)
+        jobs = self.__filter_results(jobs)
+        return jobs
         
 
-    def get_search_results(self, search_url):
-        raise NotImplementedError("Not implemented in Scraper parent class. Please use child class for specific site.")
-    
-    
-    def process_search_results(self, job_ids):
-        raise NotImplementedError("Not implemented in Scraper parent class. Please use child class for specific site.")
-    
-    
-    def filter_results(self, results):
+    def __filter_results(self, results):
         return [job for job in results if self.__job_passes_filter(job)]
     
     
